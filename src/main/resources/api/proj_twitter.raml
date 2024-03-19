@@ -1,0 +1,75 @@
+#%RAML 1.0
+title: Twitter API
+version: v1
+baseUri: https://api.twitter.com
+
+traits:
+  headersTraits:
+    headers:
+      Consumer_Key :
+        type: string
+        required: true
+        minLength: 1
+      Consumer_Secret :
+        type: string
+        required: true
+        minLength: 1
+      Access_Token :
+        type: string
+        required : true
+        minLength: 1
+      Token_Secret :
+        type: string
+        required : true
+        minLength: 1
+
+/tweet:
+  displayName: Tweet Endpoint
+  description: Endpoint for interacting with tweets
+  is: [headersTraits]
+
+  get:
+    
+    description: Retrieve user information from Twitter
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "user": {
+                  "id": "123456789",
+                  "username": "example_user"
+                }
+              }
+
+  post:
+    description: Post a tweet on Twitter
+    body:
+      application/json:
+        example: |
+          {
+            "tweet_text": "Hello, Twitter!"
+          }
+    responses:
+      201:
+        body:
+          application/json:
+            example: |
+              {
+                "tweet_id": "987654321",
+                "message": "Tweet posted successfully"
+              }
+
+  /{id}:
+    is: [headersTraits]
+    delete:
+      description: Delete a tweet on Twitter
+      responses:
+       204:
+        body:
+          application/json:
+            example: |
+              {
+                "message": "Tweet deleted successfully"
+              }

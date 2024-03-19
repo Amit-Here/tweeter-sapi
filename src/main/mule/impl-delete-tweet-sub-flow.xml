@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+    http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+    <sub-flow name="impl-delete-tweet-sub-flow" doc:id="a9dba84a-5329-4de6-b30f-d61902d9b5c8">
+
+        <set-variable value="DELETE" doc:name="httpMethod" doc:id="3ee0961b-6353-4fe8-9de5-408a34671816" variableName="httpMethod" />
+        <set-variable value='#["https://api.twitter.com/2/tweets/" ++ vars.tweetId]' doc:name="baseUrl" doc:id="664e454c-d618-4b36-b4c9-6e1f52bf158c" variableName="baseUrl" />
+        <flow-ref doc:name="generate-token-sub-flow" doc:id="6af7b15f-ef63-4d5f-a8b5-0661595debc2" name="generate-token-sub-flow" />
+        <logger level="INFO" doc:name="Before DELETE Request" doc:id="5ef4079a-0bf2-44ff-b9f2-e18911ae5f4e" message="Before Request DELETE Tweet By ID"/>
+		<http:request method="DELETE" doc:name="Request" doc:id="e7f25ea2-3d67-478e-ae64-afd583d9aee6" config-ref="HTTP_Request_configuration" path='#["/2/tweets/" ++ vars.tweetId]'>
+            <http:headers ><![CDATA[#[output application/java
+---
+{
+    Authorization : vars.oauthToken
+}]]]></http:headers>
+        </http:request>
+
+        <logger level="INFO" doc:name=" After DELETE Request" doc:id="bdaa1ccf-52de-4c41-bb07-dda3335e57e9" message="After Request DELETE Tweet By ID"/>
+		<ee:transform doc:name="Transform Message" doc:id="edb78da1-b37e-49e8-b9d6-0da32b4d63e9">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </sub-flow>
+</mule>

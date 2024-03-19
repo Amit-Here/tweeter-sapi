@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <flow name="proj_twitter-main">
+        <http:listener config-ref="proj_twitter-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="proj_twitter-config" />
+        <error-handler ref="global-error-handler" />
+    </flow>
+    <!-- [STUDIO:"proj_twitter-console"]<flow name="proj_twitter-console">
+        <http:listener config-ref="proj_twitter-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200&#93;">
+                <http:headers>#[vars.outboundHeaders default {}&#93;</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500&#93;">
+                <http:body>#[payload&#93;</http:body>
+                <http:headers>#[vars.outboundHeaders default {}&#93;</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="proj_twitter-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{message: "Resource not found"}&#93;&#93;></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow> [STUDIO] -->
+    <flow name="get:\tweet:proj_twitter-config">
+        <logger level="INFO" doc:name="Flow Started" doc:id="d0ff88e9-c618-41d9-80ec-142a4f293326" message="GET Tweet Main Flow Started" />
+        <flow-ref doc:name="impl-get-tweet-sub-flow" doc:id="a2fc60bf-2f35-4d7c-a80c-95bc8295509e" name="impl-get-tweet-sub-flow" />
+        <logger level="INFO" doc:name="Flow Ends" doc:id="53fd892a-26c8-4061-899c-0bf189f2dde6" message="GET Tweet Main Flow Ends" />
+    </flow>
+    <flow name="post:\tweet:application\json:proj_twitter-config">
+        <logger level="INFO" doc:name="Flow Started" doc:id="0b94629b-e248-469d-b387-d7e5ea7fb8fc" message="POST Tweet Main Flow Started" />
+        <flow-ref doc:name="impl-post-tweet-sub-flow" doc:id="c73ac096-3ea0-4c7c-83c1-633fc17ea232" name="impl-post-tweet-sub-flow" />
+        <logger level="INFO" doc:name="Flow Ends" doc:id="87e8d16b-0e47-4b65-bc9b-6b84e4da7a0f" message="POST Tweet Main Flow Ends" />
+    </flow>
+    <!-- [STUDIO:"delete:\tweet:proj_twitter-config"]<flow name="delete:\tweet:proj_twitter-config" doc:id="0f6e441e-8399-4254-8a98-dbb47148133b">
+        <logger level="INFO" doc:name="Flow Started" doc:id="e3e2cd65-cf00-4e92-ab5b-90b4868a1d13" message="Delete tweet Main Flow Started" />
+        <set-variable value="#[attributes.queryParams.'id'&#93;" doc:name="tweetId" doc:id="43b24426-b700-4304-9f6d-1701bb849e4b" variableName="tweetId" />
+        <flow-ref doc:name="impl-delete-tweet-sub-flow" doc:id="37c67c61-1123-4720-b161-ead8d9908c08" name="impl-delete-tweet-sub-flow" />
+        <logger level="INFO" doc:name="Flow Ends" doc:id="d4e2c682-367c-4e78-89f4-2b0e0b4cc473" message="Delete tweet Main Flow Ends" />
+    </flow> [STUDIO] -->
+    <flow name="delete:\tweet\(id):proj_twitter-config">
+        <logger level="INFO" doc:name="Flow Started" doc:id="3d7abb71-afda-450b-91bf-39d43564b7f8" message="DELETE Tweet By ID Main Flow Started" />
+		<set-variable value="#[attributes.uriParams.'id']" doc:name="tweetId" doc:id="3dec5990-67a9-48f1-84f7-4fb5c6eef7fc" variableName="tweetId" />
+        <flow-ref doc:name="impl-delete-tweet-sub-flow" doc:id="b924c06d-e09a-4a8e-9b9e-c483785d6457" name="impl-delete-tweet-sub-flow" />
+		<logger level="INFO" doc:name="Flow Ends" doc:id="f0f7e0b5-df76-41bd-8745-8d9888a29896" message="DELETE Tweet By ID Main Flow Ends" />
+    </flow>
+</mule>

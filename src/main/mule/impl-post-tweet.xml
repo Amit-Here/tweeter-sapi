@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="impl-post-tweet-sub-flow" doc:id="ba569d56-473d-4ba3-abda-48a7b95a0fb0" >
+		<set-variable value="#[payload]" doc:name="requestBody" doc:id="2b871ec0-0da0-4231-a18b-8b48421c7948" variableName="requestBody" />
+		<set-variable value="POST" doc:name="httpMethod" doc:id="d595d433-35d1-4a5b-a66c-fdd7fcda147a" variableName="httpMethod"/>
+		<set-variable value="https://api.twitter.com/2/tweets" doc:name="baseUrl" doc:id="cf90f892-74f4-4a73-8dd2-2e55548a2ca2" variableName="baseUrl"/>
+		<flow-ref doc:name="generate-token-sub-flow" doc:id="d9b529b1-644b-497c-9658-63870390e2f7" name="generate-token-sub-flow"/>
+		<logger level="INFO" doc:name="Before Create Tweet Request" doc:id="0d3a2aeb-ccee-415e-b759-c2d59949ccb1" message="Before Create Tweet Request"/>
+		<http:request method="POST" doc:name="POST Tweet" doc:id="9a8634c0-434d-4d79-9a1c-1f1d65ed8c14" config-ref="HTTP_Request_configuration" path="/2/tweets">
+			<http:body ><![CDATA[#[vars.requestBody]]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	Authorization : vars.oauthToken
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="After Create Tweet Request" doc:id="962eaf5b-3618-4554-a25f-cbcfab8ded7c" message="After Create Tweet Request"/>
+		<ee:transform doc:name="Final Response Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "tweetId": payload.data.id,
+  "tweetText": payload.data.text,
+  "tweetEditHistoryIds": [
+    {
+      "id": payload.data.edit_history_tweet_ids
+    }
+  ]
+}
+]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+	</sub-flow>
+</mule>

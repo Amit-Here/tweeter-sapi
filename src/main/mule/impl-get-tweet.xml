@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="impl-get-tweet-sub-flow" doc:id="ba569d56-473d-4ba3-abda-48a7b95a0fb0" >
+		<set-variable value="GET" doc:name="httpMethod" doc:id="f5194cb0-baab-4b19-9abe-fb07bc40faa4" variableName="httpMethod"/>
+		<set-variable value="https://api.twitter.com/2/users/me" doc:name="baseUrl" doc:id="b73f3e4c-391d-4553-a485-324292f03f26" variableName="baseUrl" />
+		<flow-ref doc:name="generate-token-sub-flow" doc:id="a673b826-585d-49a0-8157-530d1560ee40" name="generate-token-sub-flow"/>
+		<logger level="INFO" doc:name="Before Request" doc:id="247c2dc7-8f86-47a0-8d59-5bf82f11b346" message="Before GET Tweet User Info Resquest"/>
+		<http:request method="GET" doc:name="GET Users" doc:id="a867a2fd-33ec-48de-81c9-6de1a6e4b31b" config-ref="HTTP_Request_configuration" path="/2/users/me">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	Authorization : vars.oauthToken
+}]]]></http:headers>
+		</http:request>
+		<logger level="INFO" doc:name="After Request" doc:id="61e916b2-436b-4eeb-8fe8-9ecfb8846695" message="After GET Tweet User Info Resquest"/>
+		<ee:transform doc:name="Final Response Payload" doc:id="f8ff0a64-9aff-43ae-9fcc-86466e372208" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="UT-01-get-tweet.xml" />
+	<munit:test name="UT-01-get-tweet-impl-get-tweet-sub-flowTest" doc:id="a7d9bfb6-6ccf-4dee-979e-bb0a27f0d940" description="Test">
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to impl-get-tweet-sub-flow" doc:id="48448f0c-5b2c-4e64-a41f-b6e5c1a681f0" name="impl-get-tweet-sub-flow"/>
+		</munit:execution>
+	</munit:test>
+
+
+</mule>
